@@ -9,5 +9,4 @@ public class MiscApplication
 	{
 		MiscGui miscGui = new MiscGui();
 	}
-
 }

@@ -3,7 +3,6 @@ package to.richard.misc.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -12,16 +11,22 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.filechooser.FileFilter;
 
+import scott.kirk.misc.OsystemV1;
+
 public class MiscFrame extends JFrame
 {
 	private static final String TITLE = "MISC Frame";
+	private static final String DUMP_FILENAME = "dump.txt";
+	
 	private static final int FRAME_WIDTH = 500;
 	private static final int FRAME_HEIGHT = 500;
 	
-	private String _filename;
+	private OsystemV1 _os;
 	
-	public MiscFrame()
+	public MiscFrame(OsystemV1 os)
 	{
+		_os = os;
+		
 		setTitle(TITLE);
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		
@@ -35,9 +40,11 @@ public class MiscFrame extends JFrame
 		fileMenu.add(loadItem);
 		
 		JMenuItem runItem = new JMenuItem("Run");
+		runItem.addActionListener(new RunAction());
 		fileMenu.add(runItem);
 		
 		JMenuItem dumpItem = new JMenuItem("Dump");
+		dumpItem.addActionListener(new DumpAction());
 		fileMenu.add(dumpItem);
 		
 		JMenuItem exitItem = new JMenuItem("Exit");
@@ -47,17 +54,6 @@ public class MiscFrame extends JFrame
 		setJMenuBar(menuBar);
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
-	public void setFilename(String filename)
-	{
-		_filename = filename;
-		System.out.println(_filename);
-	}
-	
-	public String getFilename()
-	{
-		return _filename;
 	}
 	
 	class LoadAction implements ActionListener
@@ -88,7 +84,8 @@ public class MiscFrame extends JFrame
 					return "Text files";
 				}
 			});
-			MiscFrame.this.setFilename(fileChooser.getSelectedFile().getPath());
+			
+			MiscFrame.this._os.loadProgramFile(fileChooser.getSelectedFile().getPath());
 		}
 	}
 	
@@ -96,7 +93,7 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			
+			MiscFrame.this._os.runProgramFile();
 		}
 	}
 	
@@ -104,7 +101,7 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			
+			MiscFrame.this._os.dumpMemoryContents(DUMP_FILENAME);
 		}
 	}
 	
