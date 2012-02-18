@@ -42,4 +42,12 @@ public class RegisterSetPanel extends JPanel
 			register.updateByte(machine.getRegisterValue(i));
 		}		
 	}
+	
+	public void clearRegisters()
+	{
+		for(int i = 0; i < TOTAL_REGISTERS; i++){
+			RegisterPanel register = _registers.get(i);			
+			register.clearByte();
+		}		
+	}
 }

@@ -110,9 +110,24 @@ public class OsystemV1
 				System.out.println("Caught an IOException during closing" + e);
 			}
 		}
-
 	}
 
+	/**
+	 * Resets offsets in machine
+	 */
+	public void resetOffsets()
+	{
+		mymachine.resetOffsets();
+	}
+	
+	/**
+	 * Steps through program one step
+	 */
+	public void stepThroughProgram()
+	{
+		mymachine.runSingleInstruction();
+	}
+	
 	/**
 	  runProgramFile() is the method which causes a program previously
 	  loaded into the machine to be run
@@ -121,7 +136,6 @@ public class OsystemV1
 	public void runProgramFile()
 	{
 			mymachine.takeControl();
-
 			mymachine.showStuff();
 	}
 

@@ -1,10 +1,12 @@
 package to.richard.misc.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
@@ -18,7 +20,7 @@ public class MiscFrame extends JFrame
 	
 	private static final int FRAME_WIDTH = 500;
 	private static final int FRAME_HEIGHT = 500;
-	
+	private static final int BUTTON_PANEL_HEIGHT = 50;
 	private RegisterSetPanel _registerSet;
 	private OsystemV1 _os;
 	
@@ -41,10 +43,42 @@ public class MiscFrame extends JFrame
 			new ExitAction()));
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+	
 		_registerSet = new RegisterSetPanel();
+		
+		ButtonPanel buttonPanel = new ButtonPanel(new StepAction(), new ClearAction());
+		Dimension buttonPanelDim = new Dimension(FRAME_WIDTH, BUTTON_PANEL_HEIGHT);
+		buttonPanel.setPreferredSize(buttonPanelDim);
+		buttonPanel.setMaximumSize(buttonPanelDim);
+		
 		Container contentPane = getContentPane();
+		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.add(_registerSet);
+		contentPane.add(buttonPanel);
+	}
+	
+	/**
+	 * Steps through program one step at a time
+	 */
+	class StepAction implements ActionListener
+	{
+		public void actionPerformed(ActionEvent event)
+		{
+			_os.stepThroughProgram();
+			MachineV1 machine = _os.getMachine();
+			_registerSet.updateRegisters(machine);
+		}
+	}
+	
+	/**
+	 * Clears registers
+	 */
+	class ClearAction implements ActionListener
+	{
+		public void actionPerformed(ActionEvent event)
+		{
+			_registerSet.clearRegisters();
+		}
 	}
 	
 	/**
@@ -80,19 +114,20 @@ public class MiscFrame extends JFrame
 				}
 			});
 			
-			MiscFrame.this._os.loadProgramFile(fileChooser.getSelectedFile().getPath());
+			_os.loadProgramFile(fileChooser.getSelectedFile().getPath());
 		}
 	}
 	
 	/**
-	 * Runs the loaded program
+	 * Runs the loaded program from start to finish
 	 */
 	class RunAction implements ActionListener
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			MiscFrame.this._os.runProgramFile();
-			MachineV1 machine = MiscFrame.this._os.getMachine();
+			_registerSet.clearRegisters();
+			_os.runProgramFile();
+			MachineV1 machine = _os.getMachine();
 			_registerSet.updateRegisters(machine);
 		}
 	}
@@ -108,7 +143,7 @@ public class MiscFrame extends JFrame
 			fileChooser.setCurrentDirectory(new File("."));
 			fileChooser.showSaveDialog(MiscFrame.this);
 			String filename = fileChooser.getSelectedFile().getPath();
-			MiscFrame.this._os.dumpMemoryContents(filename);
+			_os.dumpMemoryContents(filename);
 		}
 	}
 	

@@ -383,14 +383,24 @@ public class MachineV1
 
 	public void takeControl()
 	{
-		int i;
-		int memoffset;
-
 		resetOffsets();
+		
+		boolean hasMoreInstructions = true;		
+		while(hasMoreInstructions){
+			hasMoreInstructions = runSingleInstruction();
+		}
+	}
 
+	/**
+	 * Runs a single instruction if there are instructions to run
+	 * 
+	 * @return boolean
+	 */
+	public boolean runSingleInstruction()
+	{
 		/*  Convert the word offset to a byte offset.  */
 
-		memoffset = bytesinword * reg[5].getIntFromByte();
+		int memoffset = bytesinword * reg[5].getIntFromByte();
 
 		/*  Now copy the instruction and operands from the
 		byte addresses in memory into the instruction and
@@ -400,10 +410,9 @@ public class MachineV1
 		reg[12].copyByteIn(memory[memoffset + 1]);
 		reg[13].copyByteIn(memory[memoffset + 2]);
 		reg[14].copyByteIn(memory[memoffset + 3]);
-
-		while(!reg[11].compareByteWithString("00000000"))
+		
+		if(!reg[11].compareByteWithString("00000000"))
 		{
-
 			/*  Increment code offset by 1.  */
 
 			reg[5].incrementByte();
@@ -461,16 +470,11 @@ public class MachineV1
 				System.out.println("Didn't find instruction match in takecontrol loop.");
 				reg[11].showByte();
 			}
-
-			memoffset = bytesinword * reg[5].getIntFromByte();
-			reg[11].copyByteIn(memory[memoffset]);
-			reg[12].copyByteIn(memory[memoffset + 1]);
-			reg[13].copyByteIn(memory[memoffset + 2]);
-			reg[14].copyByteIn(memory[memoffset + 3]);
+			return true;
 		}
+		return false;
 	}
-
-
+	
 	/*****************************/
 	/*  Move instructions  */
 	/*****************************/
