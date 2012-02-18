@@ -1179,4 +1179,18 @@ public class MachineV1
 		  reg[5].copyByteIn(reg[12]);
 	}
 
+	/**
+	 * Gets register value as a string
+	 * 
+	 * @param index
+	 * 
+	 * @return Byte in register as string
+	 */
+	public String getRegisterValue(int index)
+	{
+		if(index < 0 && index >= numberofregisters){
+			return null;
+		}
+		return reg[index].getStringFromByte();
+	}
 }

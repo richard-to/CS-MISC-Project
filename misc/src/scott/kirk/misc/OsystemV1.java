@@ -29,7 +29,11 @@ public class OsystemV1
 		mymachine = new MachineV1();
 	}
 
-
+	public MachineV1 getMachine()
+	{
+		return mymachine;
+	}
+	
 	/**
 	  loadProgramFile() is the method which causes the contents of a text
 	  file to be loaded into the machine.
