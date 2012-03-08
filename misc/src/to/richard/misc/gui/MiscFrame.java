@@ -22,6 +22,7 @@ public class MiscFrame extends JFrame
 	private static final int FRAME_HEIGHT = 500;
 	private static final int BUTTON_PANEL_HEIGHT = 50;
 	private RegisterSetPanel _registerSet;
+	private MemoryPanel _memory;
 	private OsystemV1 _os;
 	
 	/**
@@ -45,6 +46,7 @@ public class MiscFrame extends JFrame
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
 		_registerSet = new RegisterSetPanel();
+		_memory = new MemoryPanel();
 		
 		ButtonPanel buttonPanel = new ButtonPanel(new StepAction(), new ClearAction());
 		Dimension buttonPanelDim = new Dimension(FRAME_WIDTH, BUTTON_PANEL_HEIGHT);
@@ -54,6 +56,7 @@ public class MiscFrame extends JFrame
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.add(_registerSet);
+		contentPane.add(_memory);
 		contentPane.add(buttonPanel);
 	}
 	
@@ -67,6 +70,7 @@ public class MiscFrame extends JFrame
 			_os.stepThroughProgram();
 			MachineV1 machine = _os.getMachine();
 			_registerSet.updateRegisters(machine);
+			_memory.updateMemory(machine);			
 		}
 	}
 	
@@ -129,6 +133,7 @@ public class MiscFrame extends JFrame
 			_os.runProgramFile();
 			MachineV1 machine = _os.getMachine();
 			_registerSet.updateRegisters(machine);
+			_memory.updateMemory(machine);
 		}
 	}
 	

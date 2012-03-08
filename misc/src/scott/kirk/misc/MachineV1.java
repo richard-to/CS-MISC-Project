@@ -1,9 +1,8 @@
 package scott.kirk.misc;
 
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 /*******************************************************************
@@ -1196,5 +1195,25 @@ public class MachineV1
 			return null;
 		}
 		return reg[index].getStringFromByte();
+	}
+	
+	/**
+	 * Gets memory from machine as string
+	 * 
+	 * @return String
+	 */
+	public String getMemory()
+	{
+		String memoryStr = "";
+		int j = 0;
+		for(int i = 0; i < memorysizeinwords; i++)
+		{
+			memoryStr += memory[i].getStringFromByte();
+			if(++j == 4){
+				memoryStr += "\n";
+				j = 0;
+			}
+		}	
+		return memoryStr;
 	}
 }
