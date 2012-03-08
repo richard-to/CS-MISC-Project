@@ -1,5 +1,8 @@
 package to.richard.misc.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -11,6 +14,7 @@ public class RegisterPanel extends JPanel
 	
 	private JLabel _label;
 	private JTextField _text;
+	private RegisterPanel _nextRegister;
 	
 	/**
 	 * Register Panel constructor
@@ -22,7 +26,7 @@ public class RegisterPanel extends JPanel
 	{
 		_label = new JLabel(LABEL_PREFIX + Integer.toString(num));
 		_text = new JTextField(DEFAULT_BYTE);
-		
+		_text.addActionListener(new TextListener());
 		add(_label);
 		add(_text);
 	}
@@ -43,5 +47,32 @@ public class RegisterPanel extends JPanel
 	public void clearByte()
 	{
 		_text.setText(DEFAULT_BYTE);
+	}
+	
+	/**
+	 * Sets next register for focus shift
+	 * 
+	 * @param registerPanel
+	 */
+	public void setNextRegister(RegisterPanel registerPanel)
+	{
+		_nextRegister = registerPanel;
+	}
+	
+	/**
+	 * Shifts focus to this register
+	 */
+	public void shiftFocus()
+	{
+		_text.requestFocusInWindow();
+	}
+	
+
+	private class TextListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent event)
+		{
+			_nextRegister.shiftFocus();
+		}
 	}	
 }

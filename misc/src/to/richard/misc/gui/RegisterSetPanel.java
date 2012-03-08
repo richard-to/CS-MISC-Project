@@ -27,7 +27,16 @@ public class RegisterSetPanel extends JPanel
 			RegisterPanel registerPanel = new RegisterPanel(i);
 			_registers.put(i, registerPanel);
 			add(registerPanel);
-		}	
+		}
+		
+		for(int i = 0; i < TOTAL_REGISTERS; i++){
+			RegisterPanel registerPanel = _registers.get(i);
+			if(i+1 == TOTAL_REGISTERS){
+				registerPanel.setNextRegister(_registers.get(0));
+			} else {
+				registerPanel.setNextRegister(_registers.get(i+1));
+			}
+		}
 	}
 	
 	/**

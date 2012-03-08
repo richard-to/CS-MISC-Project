@@ -13,6 +13,7 @@ public class ButtonPanel extends JPanel
 	
 	private static final int ROWS = 1;
 	private static final int COLS = 2;
+	
 	public ButtonPanel(ActionListener stepAction, ActionListener clearAction)
 	{
 		setLayout(new GridLayout(ROWS, COLS));
