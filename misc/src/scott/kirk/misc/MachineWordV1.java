@@ -1,7 +1,11 @@
 package scott.kirk.misc;
 
-public class MachineWordV1
+import java.io.Serializable;
+
+public class MachineWordV1 implements Serializable
 {
+	private static final long serialVersionUID = 21347381503081244L;
+
 	public static final int bytesinword = 4;
 
 	private MachineByteV1[] bytearray = new MachineByteV1[bytesinword];

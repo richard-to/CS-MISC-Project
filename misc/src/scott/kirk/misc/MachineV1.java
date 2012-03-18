@@ -1221,4 +1221,36 @@ public class MachineV1
 		}	
 		return memoryStr;
 	}
+	
+	/**
+	 * Quick way to retrieve registers for saving
+	 * 
+	 * @return registers
+	 */
+	public MachineByteV1[] getRegisterObj()
+	{
+		return reg;
+	}
+	
+	/**
+	 * Quick way to get memory for saving
+	 * 
+	 * @return memory
+	 */
+	public MachineByteV1[] getMemoryObj()
+	{
+		return memory;
+	}
+	
+	/**
+	 * Load state of machine from saved state
+	 * 
+	 * @param registersIn
+	 * @param memoryIn
+	 */
+	public void loadState(MachineByteV1[] registersIn, MachineByteV1[] memoryIn)
+	{
+		reg = registersIn;
+		memory = memoryIn;
+	}
 }
