@@ -382,14 +382,12 @@ public class MachineV1
 
 	public void takeControl()
 	{
-		resetOffsets();
-		
 		boolean hasMoreInstructions = true;		
 		while(hasMoreInstructions){
 			hasMoreInstructions = runSingleInstruction();
 		}
 	}
-	
+		
 	public int getMemOffset()
 	{
 		return reg[5].getIntFromByte();

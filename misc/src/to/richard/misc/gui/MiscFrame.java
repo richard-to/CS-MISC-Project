@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,6 +33,7 @@ public class MiscFrame extends JFrame
 	private MemoryPanel _memory;
 	private OsystemV1 _os;
 	private MachineV1 _machine;
+	
 	/**
 	 * Constructor for MISC application
 	 * 
@@ -57,7 +60,7 @@ public class MiscFrame extends JFrame
 		_registerSet = new RegisterSetPanel(_machine);
 		_memory = new MemoryPanel(_machine);
 		
-		ButtonPanel buttonPanel = new ButtonPanel(new StepAction(), new ClearAction());
+		ButtonPanel buttonPanel = new ButtonPanel(new RunAction(), new StepAction(), new ClearAction());
 		Dimension buttonPanelDim = new Dimension(FRAME_WIDTH, BUTTON_PANEL_HEIGHT);
 		buttonPanel.setPreferredSize(buttonPanelDim);
 		buttonPanel.setMaximumSize(buttonPanelDim);
@@ -118,7 +121,7 @@ public class MiscFrame extends JFrame
 					_memory.updateMemory();
 				}						
 			}catch(IOException e){
-				System.out.println("Error: Could not load game.");
+				System.out.println("Error: Could not load state.");
 			} catch(ClassNotFoundException e) {
 				System.out.println("Error: Invalid or corrupted file.");
 			}			
@@ -143,7 +146,7 @@ public class MiscFrame extends JFrame
 					objOut.close();
 				}
 			} catch(IOException e) {
-				System.out.println("Could not write to file.");
+				System.out.println("Could not save state to file.");
 			}			
 		}
 	}
@@ -196,12 +199,25 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			_registerSet.clearRegisters();
-			_memory.updateMachineMemory();			
-			_os.runProgramFile();
-			_registerSet.updateRegisters();
-			_memory.updateMemory();
+			(new Thread(new RunProgramRunnable())).start();
 		}
+	}
+	
+	class RunProgramRunnable implements Runnable
+	{
+		public void run()
+		{
+			_memory.updateMachineMemory();			
+			while(_os.stepThroughProgram()){
+				try {
+					Thread.sleep(300);					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				_registerSet.updateRegisters();
+				_memory.updateMemory();				
+			}
+		}		
 	}
 	
 	/**
@@ -222,13 +238,13 @@ public class MiscFrame extends JFrame
 	}
 	
 	/**
-	 * Exits MISC GUI application
+	 * Closes Frame
 	 */
 	class ExitAction implements ActionListener
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			System.exit(0);
+			MiscFrame.this.dispose();
 		}
 	}	
 }

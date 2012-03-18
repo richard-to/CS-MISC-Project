@@ -123,9 +123,9 @@ public class OsystemV1
 	/**
 	 * Steps through program one step
 	 */
-	public void stepThroughProgram()
+	public boolean stepThroughProgram()
 	{
-		mymachine.runSingleInstruction();
+		return mymachine.runSingleInstruction();
 	}
 	
 	/**

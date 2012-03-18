@@ -9,8 +9,6 @@ public class MiscApplication
 	 */
 	public static void main(String[] args) 
 	{
-		OsystemV1 os = new OsystemV1();
-		MiscFrame miscFrame = new MiscFrame(os);
-		miscFrame.setVisible(true);		
+		MiscFrameManager MiscManager = new MiscFrameManager();	
 	}
 }
