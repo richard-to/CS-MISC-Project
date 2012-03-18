@@ -24,7 +24,7 @@ public class MiscFrame extends JFrame
 	private RegisterSetPanel _registerSet;
 	private MemoryPanel _memory;
 	private OsystemV1 _os;
-	
+	private MachineV1 _machine;
 	/**
 	 * Constructor for MISC application
 	 * 
@@ -33,6 +33,7 @@ public class MiscFrame extends JFrame
 	public MiscFrame(OsystemV1 os)
 	{
 		_os = os;
+		_machine = _os.getMachine();
 		
 		setTitle(TITLE);
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
@@ -45,8 +46,8 @@ public class MiscFrame extends JFrame
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
-		_registerSet = new RegisterSetPanel();
-		_memory = new MemoryPanel();
+		_registerSet = new RegisterSetPanel(_machine);
+		_memory = new MemoryPanel(_machine);
 		
 		ButtonPanel buttonPanel = new ButtonPanel(new StepAction(), new ClearAction());
 		Dimension buttonPanelDim = new Dimension(FRAME_WIDTH, BUTTON_PANEL_HEIGHT);
@@ -67,10 +68,10 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
+			_memory.updateMachineMemory();
 			_os.stepThroughProgram();
-			MachineV1 machine = _os.getMachine();
-			_registerSet.updateRegisters(machine);
-			_memory.updateMemory(machine);			
+			_registerSet.updateRegisters();
+			_memory.updateMemory();			
 		}
 	}
 	
@@ -119,6 +120,7 @@ public class MiscFrame extends JFrame
 			});
 			
 			_os.loadProgramFile(fileChooser.getSelectedFile().getPath());
+			_memory.updateMemory();	
 		}
 	}
 	
@@ -130,10 +132,10 @@ public class MiscFrame extends JFrame
 		public void actionPerformed(ActionEvent event)
 		{
 			_registerSet.clearRegisters();
+			_memory.updateMachineMemory();			
 			_os.runProgramFile();
-			MachineV1 machine = _os.getMachine();
-			_registerSet.updateRegisters(machine);
-			_memory.updateMemory(machine);
+			_registerSet.updateRegisters();
+			_memory.updateMemory();
 		}
 	}
 	

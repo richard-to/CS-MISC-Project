@@ -389,7 +389,12 @@ public class MachineV1
 			hasMoreInstructions = runSingleInstruction();
 		}
 	}
-
+	
+	public int getMemOffset()
+	{
+		return reg[5].getIntFromByte();
+	}
+	
 	/**
 	 * Runs a single instruction if there are instructions to run
 	 * 
@@ -1206,7 +1211,7 @@ public class MachineV1
 	{
 		String memoryStr = "";
 		int j = 0;
-		for(int i = 0; i < memorysizeinwords; i++)
+		for(int i = 0; i < memorysizeinbytes; i++)
 		{
 			memoryStr += memory[i].getStringFromByte();
 			if(++j == 4){
