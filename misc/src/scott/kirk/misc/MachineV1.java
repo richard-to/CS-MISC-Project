@@ -1,9 +1,8 @@
 package scott.kirk.misc;
 
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 
 /*******************************************************************
@@ -383,14 +382,17 @@ public class MachineV1
 
 	public void takeControl()
 	{
-		resetOffsets();
-		
 		boolean hasMoreInstructions = true;		
 		while(hasMoreInstructions){
 			hasMoreInstructions = runSingleInstruction();
 		}
 	}
-
+		
+	public int getMemOffset()
+	{
+		return reg[5].getIntFromByte();
+	}
+	
 	/**
 	 * Runs a single instruction if there are instructions to run
 	 * 
@@ -1196,5 +1198,57 @@ public class MachineV1
 			return null;
 		}
 		return reg[index].getStringFromByte();
+	}
+	
+	/**
+	 * Gets memory from machine as string
+	 * 
+	 * @return String
+	 */
+	public String getMemory()
+	{
+		String memoryStr = "";
+		int j = 0;
+		for(int i = 0; i < memorysizeinbytes; i++)
+		{
+			memoryStr += memory[i].getStringFromByte();
+			if(++j == 4){
+				memoryStr += "\n";
+				j = 0;
+			}
+		}	
+		return memoryStr;
+	}
+	
+	/**
+	 * Quick way to retrieve registers for saving
+	 * 
+	 * @return registers
+	 */
+	public MachineByteV1[] getRegisterObj()
+	{
+		return reg;
+	}
+	
+	/**
+	 * Quick way to get memory for saving
+	 * 
+	 * @return memory
+	 */
+	public MachineByteV1[] getMemoryObj()
+	{
+		return memory;
+	}
+	
+	/**
+	 * Load state of machine from saved state
+	 * 
+	 * @param registersIn
+	 * @param memoryIn
+	 */
+	public void loadState(MachineByteV1[] registersIn, MachineByteV1[] memoryIn)
+	{
+		reg = registersIn;
+		memory = memoryIn;
 	}
 }

@@ -14,12 +14,15 @@ public class RegisterSetPanel extends JPanel
 	private static final int TOTAL_REGISTERS = 18;
 	
 	private HashMap<Integer, RegisterPanel> _registers;
+	private MachineV1 _machine;
 	
 	/**
 	 * Constructor for register set panel
 	 */
-	public RegisterSetPanel()
+	public RegisterSetPanel(MachineV1 machine)
 	{
+		_machine = machine;
+		
 		setLayout(new GridLayout(ROWS, COLS));
 		_registers = new HashMap<Integer, RegisterPanel>();
 		
@@ -27,19 +30,26 @@ public class RegisterSetPanel extends JPanel
 			RegisterPanel registerPanel = new RegisterPanel(i);
 			_registers.put(i, registerPanel);
 			add(registerPanel);
-		}	
+		}
+		
+		for(int i = 0; i < TOTAL_REGISTERS; i++){
+			RegisterPanel registerPanel = _registers.get(i);
+			if(i+1 == TOTAL_REGISTERS){
+				registerPanel.setNextRegister(_registers.get(0));
+			} else {
+				registerPanel.setNextRegister(_registers.get(i+1));
+			}
+		}
 	}
 	
 	/**
 	 * Updates registers with machine
-	 * 
-	 * @param machine
 	 */
-	public void updateRegisters(MachineV1 machine)
+	public void updateRegisters()
 	{
 		for(int i = 0; i < TOTAL_REGISTERS; i++){
 			RegisterPanel register = _registers.get(i);
-			register.updateByte(machine.getRegisterValue(i));
+			register.updateByte(_machine.getRegisterValue(i));
 		}		
 	}
 	

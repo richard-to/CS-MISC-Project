@@ -11,12 +11,16 @@ public class MiscMenu extends JMenuBar
 	/**
 	 * MISC Menu constructor
 	 * 
+	 * @param loadStateAction
+	 * @param saveStateAction
 	 * @param loadAction
 	 * @param runAction
 	 * @param dumpAction
 	 * @param exitAction
 	 */
 	public MiscMenu(
+		ActionListener loadStateAction,
+		ActionListener saveStateAction,
 		ActionListener loadAction, 
 		ActionListener runAction, 
 		ActionListener dumpAction,
@@ -24,6 +28,14 @@ public class MiscMenu extends JMenuBar
 	{
 		JMenu fileMenu = new JMenu("File");
 		this.add(fileMenu);
+		
+		JMenuItem loadStateItem = new JMenuItem("Load State");
+		loadStateItem.addActionListener(loadStateAction);
+		fileMenu.add(loadStateItem);
+		
+		JMenuItem saveStateItem = new JMenuItem("Save State");
+		saveStateItem.addActionListener(saveStateAction);
+		fileMenu.add(saveStateItem);
 		
 		JMenuItem loadItem = new JMenuItem("Load");
 		loadItem.addActionListener(loadAction);

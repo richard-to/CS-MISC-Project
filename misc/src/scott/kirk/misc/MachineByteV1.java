@@ -1,5 +1,7 @@
 package scott.kirk.misc;
 
+import java.io.Serializable;
+
 /**
   The MachineByte class is the building block for both
 registers and memory.  Although in theory the byte size can
@@ -16,8 +18,10 @@ order for them to be handled correctly by the rest of the
 machine.
 */
 
-public class MachineByteV1
+public class MachineByteV1 implements Serializable
 {
+	private static final long serialVersionUID = -4131261671180304091L;
+	
 	public static final int bitsinbyte = 8;
 	private static final String junk = "00000000";
 	private char bytearray[] = new char[bitsinbyte];

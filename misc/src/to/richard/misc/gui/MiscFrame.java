@@ -4,13 +4,21 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 
+import scott.kirk.misc.MachineByteV1;
 import scott.kirk.misc.MachineV1;
 import scott.kirk.misc.OsystemV1;
 
@@ -22,7 +30,9 @@ public class MiscFrame extends JFrame
 	private static final int FRAME_HEIGHT = 500;
 	private static final int BUTTON_PANEL_HEIGHT = 50;
 	private RegisterSetPanel _registerSet;
+	private MemoryPanel _memory;
 	private OsystemV1 _os;
+	private MachineV1 _machine;
 	
 	/**
 	 * Constructor for MISC application
@@ -32,11 +42,14 @@ public class MiscFrame extends JFrame
 	public MiscFrame(OsystemV1 os)
 	{
 		_os = os;
+		_machine = _os.getMachine();
 		
 		setTitle(TITLE);
 		setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		
 		setJMenuBar(new MiscMenu(
+			new LoadStateAction(),
+			new SaveStateAction(),
 			new LoadAction(),
 			new RunAction(),
 			new DumpAction(),
@@ -44,9 +57,10 @@ public class MiscFrame extends JFrame
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	
-		_registerSet = new RegisterSetPanel();
+		_registerSet = new RegisterSetPanel(_machine);
+		_memory = new MemoryPanel(_machine);
 		
-		ButtonPanel buttonPanel = new ButtonPanel(new StepAction(), new ClearAction());
+		ButtonPanel buttonPanel = new ButtonPanel(new RunAction(), new StepAction(), new ClearAction());
 		Dimension buttonPanelDim = new Dimension(FRAME_WIDTH, BUTTON_PANEL_HEIGHT);
 		buttonPanel.setPreferredSize(buttonPanelDim);
 		buttonPanel.setMaximumSize(buttonPanelDim);
@@ -54,6 +68,7 @@ public class MiscFrame extends JFrame
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.add(_registerSet);
+		contentPane.add(_memory);
 		contentPane.add(buttonPanel);
 	}
 	
@@ -64,9 +79,10 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
+			_memory.updateMachineMemory();
 			_os.stepThroughProgram();
-			MachineV1 machine = _os.getMachine();
-			_registerSet.updateRegisters(machine);
+			_registerSet.updateRegisters();
+			_memory.updateMemory();			
 		}
 	}
 	
@@ -81,6 +97,60 @@ public class MiscFrame extends JFrame
 		}
 	}
 	
+	class LoadStateAction implements ActionListener
+	{
+		public void actionPerformed(ActionEvent event)
+		{
+			try{
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setCurrentDirectory(new File("."));
+				int option = fileChooser.showOpenDialog(MiscFrame.this);
+				
+				if(option == JFileChooser.APPROVE_OPTION){
+					String filename = fileChooser.getSelectedFile().getPath();
+	
+					ObjectInputStream objIn = new ObjectInputStream(
+					new FileInputStream(filename));
+	
+					MachineByteV1[] registers = (MachineByteV1[])objIn.readObject();
+					MachineByteV1[] memory = (MachineByteV1[])objIn.readObject();
+					objIn.close();
+					
+					_machine.loadState(registers, memory);
+					_registerSet.updateRegisters();
+					_memory.updateMemory();
+				}						
+			}catch(IOException e){
+				System.out.println("Error: Could not load state.");
+			} catch(ClassNotFoundException e) {
+				System.out.println("Error: Invalid or corrupted file.");
+			}			
+		}
+	}
+	
+	class SaveStateAction implements ActionListener
+	{
+		public void actionPerformed(ActionEvent event)
+		{
+			try{
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setCurrentDirectory(new File("."));
+				int option = fileChooser.showSaveDialog(MiscFrame.this);
+				
+				if(option == JFileChooser.APPROVE_OPTION){
+					String filename = fileChooser.getSelectedFile().getPath();
+					ObjectOutputStream objOut = new ObjectOutputStream(
+						new FileOutputStream(filename));
+					objOut. writeObject(_machine.getRegisterObj());
+					objOut.writeObject(_machine.getMemoryObj());
+					objOut.close();
+				}
+			} catch(IOException e) {
+				System.out.println("Could not save state to file.");
+			}			
+		}
+	}
+	
 	/**
 	 * Loads program into OsystemV1
 	 */
@@ -90,31 +160,35 @@ public class MiscFrame extends JFrame
 		{
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File("."));
-			fileChooser.showOpenDialog(MiscFrame.this);
-			fileChooser.setAcceptAllFileFilterUsed(false);
-			fileChooser.addChoosableFileFilter(new FileFilter(){
-				
-				private static final String ALLOWED_EXT = "txt";
-				private static final String DESCRIPTION = "Text files";
-				
-				public boolean accept(File file){
-					String filename = file.getName();
-					int i = filename.lastIndexOf('.');
-			        if (i > 0 &&  i < filename.length() - 1) {
-			        	String ext = filename.substring(i+1).toLowerCase();
-			        	if(ext.equals(ALLOWED_EXT)){
-			        		return true;
-			        	}
-			        }							
-					return false;
-				}
-				
-				public String getDescription(){
-					return DESCRIPTION;
-				}
-			});
+			int option = fileChooser.showOpenDialog(MiscFrame.this);
 			
-			_os.loadProgramFile(fileChooser.getSelectedFile().getPath());
+			if(option == JFileChooser.APPROVE_OPTION){
+				fileChooser.setAcceptAllFileFilterUsed(false);
+				fileChooser.addChoosableFileFilter(new FileFilter(){
+					
+					private static final String ALLOWED_EXT = "txt";
+					private static final String DESCRIPTION = "Text files";
+					
+					public boolean accept(File file){
+						String filename = file.getName();
+						int i = filename.lastIndexOf('.');
+				        if (i > 0 &&  i < filename.length() - 1) {
+				        	String ext = filename.substring(i+1).toLowerCase();
+				        	if(ext.equals(ALLOWED_EXT)){
+				        		return true;
+				        	}
+				        }							
+						return false;
+					}
+					
+					public String getDescription(){
+						return DESCRIPTION;
+					}
+				});
+				
+				_os.loadProgramFile(fileChooser.getSelectedFile().getPath());
+				_memory.updateMemory();
+			}
 		}
 	}
 	
@@ -125,11 +199,25 @@ public class MiscFrame extends JFrame
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			_registerSet.clearRegisters();
-			_os.runProgramFile();
-			MachineV1 machine = _os.getMachine();
-			_registerSet.updateRegisters(machine);
+			(new Thread(new RunProgramRunnable())).start();
 		}
+	}
+	
+	class RunProgramRunnable implements Runnable
+	{
+		public void run()
+		{
+			_memory.updateMachineMemory();			
+			while(_os.stepThroughProgram()){
+				try {
+					Thread.sleep(300);					
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				_registerSet.updateRegisters();
+				_memory.updateMemory();				
+			}
+		}		
 	}
 	
 	/**
@@ -141,20 +229,22 @@ public class MiscFrame extends JFrame
 		{
 			JFileChooser fileChooser = new JFileChooser();
 			fileChooser.setCurrentDirectory(new File("."));
-			fileChooser.showSaveDialog(MiscFrame.this);
-			String filename = fileChooser.getSelectedFile().getPath();
-			_os.dumpMemoryContents(filename);
+			int option = fileChooser.showSaveDialog(MiscFrame.this);
+			if(option == JFileChooser.APPROVE_OPTION){
+				String filename = fileChooser.getSelectedFile().getPath();
+				_os.dumpMemoryContents(filename);
+			}
 		}
 	}
 	
 	/**
-	 * Exits MISC GUI application
+	 * Closes Frame
 	 */
 	class ExitAction implements ActionListener
 	{
 		public void actionPerformed(ActionEvent event)
 		{
-			System.exit(0);
+			MiscFrame.this.dispose();
 		}
 	}	
 }
