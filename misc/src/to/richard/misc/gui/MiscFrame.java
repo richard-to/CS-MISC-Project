@@ -68,8 +68,8 @@ public class MiscFrame extends JFrame
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
 		contentPane.add(_registerSet);
-		contentPane.add(_memory);
 		contentPane.add(buttonPanel);
+		contentPane.add(_memory);		
 	}
 	
 	/**
